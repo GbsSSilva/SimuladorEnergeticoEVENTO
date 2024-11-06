@@ -1,0 +1,17 @@
+.analysis-button {
+    position: absolute;
+    bottom: 200px;
+    right: 500px;
+    padding: 10px 20px;
+    background-color: #00cc44;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 999;  
+  }
+  
+  .analysis-button:hover {
+    background-color: #008f32;
+  }
+  
