@@ -104,6 +104,19 @@ export const HomeButton = styled(Button)`
   }
 `;
 
+// Adiciona um estilo para o contador de progresso
+export const ProgressCounter = styled.div`
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2d4a60;
+  margin-bottom: 20px;
+
+  @media screen and (max-width: 768px) {
+    font-size: 1rem;
+  }
+`;
+
+
 // Estilo para mensagens de erro
 export const ErrorMessage = styled.p`
   color: #ff4d4d;

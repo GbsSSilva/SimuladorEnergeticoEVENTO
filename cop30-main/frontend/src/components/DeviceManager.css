@@ -12,13 +12,15 @@
 }
 
 .device-manager {
-  width: 80%;
+  width: 90%;
   max-width: 600px;
   background-color: #f9f7d9;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
   position: relative;
+  max-height: 90vh; /* Rolagem no modal principal */
+  overflow-y: auto;
 }
 
 .device-list, .room-list {
@@ -26,8 +28,7 @@
   padding: 10px;
   border-radius: 5px;
   background-color: #ffffff;
-  max-height: 200px;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .device {
@@ -40,8 +41,7 @@
 
 .room {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column; /* Alinhar os dispositivos verticalmente */
   margin-top: 10px;
   padding: 15px;
   background-color: #e9f7ef;
@@ -93,6 +93,18 @@
   margin-left: auto;
 }
 
+/* Botão de Editar */
+.edit-room-button {
+  background-color: #ffa500; /* Cor laranja para destacar */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 10px; 
+}
+
 .room-device button {
   background-color: #ff6b6b;
   color: white;
@@ -101,4 +113,21 @@
   padding: 3px 5px;
   cursor: pointer;
   margin-left: 10px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .device-manager {
+    width: 95%; /* Mais espaço para dispositivos menores */
+    padding: 15px;
+  }
+
+  .close-device-manager-button {
+    padding: 6px;
+  }
+
+  .add-room-button, .delete-room-button, .edit-room-button {
+    font-size: 14px;
+    padding: 6px 8px;
+  }
 }

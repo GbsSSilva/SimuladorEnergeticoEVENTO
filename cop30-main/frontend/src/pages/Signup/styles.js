@@ -1,10 +1,26 @@
 // src/pages/Signup/styles.js
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import bgImage from "../../components/img/bgcop304.jpg";
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const maxWidth = "350px"; // Tamanho máximo para todos os elementos
 
 export const PageContainer = styled.div`
   display: flex;
   height: 100vh;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 export const LeftPanel = styled.div`
@@ -15,6 +31,7 @@ export const LeftPanel = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: ${fadeIn} 1s ease-out;
 `;
 
 export const BackgroundText = styled.h1`
@@ -36,14 +53,6 @@ export const RightPanel = styled.div`
   background-color: #f5f5f5;
 `;
 
-export const Container = styled.div`
-  width: 90%;
-  max-width: 400px;
-  padding: 40px;
-  border-radius: 12px;
-  text-align: center;
-`;
-
 export const Label = styled.h2`
   font-size: 2rem;
   color: #2d572c;
@@ -56,22 +65,24 @@ export const Content = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 15px;
+  width: 100%;
+  max-width: ${maxWidth};
 `;
 
-export const LabelError = styled.p`
-  color: #ff6b6b;
-  font-size: 0.9rem;
-  margin: 10px 0;
-`;
+export const InputField = styled.input`
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #2d572c;
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
 
-export const LabelSignin = styled.p`
-  font-size: 0.9rem;
-  color: #666;
-`;
-
-export const Strong = styled.strong`
-  color: #2d572c;
-  font-weight: bold;
+  &:focus {
+    border-color: #245f2c;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    outline: none;
+  }
 `;
 
 export const PasswordContainer = styled.div`
@@ -88,20 +99,19 @@ export const PasswordToggle = styled.div`
   color: #666;
 `;
 
-export const InputField = styled.input`
-  width: 100%;
-  padding: 12px;
-  font-size: 1rem;
-  border: 1px solid #2d572c; 
-  border-radius: 5px;
-  background-color: #ffffff;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra leve */
-  color: #333;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+export const LabelError = styled.p`
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin: 10px 0;
+  text-align: center;
+`;
 
-  &:focus {
-    border-color: #245f2c; /* Cor de borda mais escura ao focar */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Aumenta a sombra ao focar */
-    outline: none;
-  }
+export const LabelSignin = styled.p`
+  font-size: 0.9rem;
+  color: #666;
+`;
+
+export const Strong = styled.strong`
+  color: #2d572c;
+  cursor: pointer;
 `;

@@ -5,7 +5,11 @@ import Button from "../../components/Button";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import { auth } from "../../firebase/firebase";
 
 const Signin = () => {
@@ -64,16 +68,11 @@ const Signin = () => {
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </C.PasswordToggle>
           </C.PasswordContainer>
-          {/* Mover o link "Esqueceu sua senha?" logo abaixo do campo de senha */}
           <C.ForgotPasswordLink>
             <Link to="/forgot-password">Esqueceu sua senha?</Link>
           </C.ForgotPasswordLink>
-          <C.labelError>{error}</C.labelError>
-          <Button
-            Text="Entrar"
-            onClick={handleLogin}
-            backgroundColor="#2d572c"
-          />
+          {error && <C.labelError>{error}</C.labelError>}
+          <Button Text="Entrar" onClick={handleLogin} />
           <C.GoogleButton onClick={handleGoogleLogin}>
             <FcGoogle size={24} />
             <span>Entrar com Google</span>

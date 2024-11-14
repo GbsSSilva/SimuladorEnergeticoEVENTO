@@ -1,36 +1,32 @@
-// DeviceManager.js
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase/firebase';
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './DeviceManager.css';
-
-const DeviceType = 'DEVICE';
 
 const DeviceManager = ({ onClose }) => {
   const [devices, setDevices] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [editingRoom, setEditingRoom] = useState(null);
 
-  // Função para buscar cômodos e dispositivos do Firestore
   const fetchRoomsAndDevices = async () => {
     const user = auth.currentUser;
     if (user) {
       const uid = user.uid;
       try {
-        // Busca todos os quartos e identifica os dispositivos já alocados
         const roomsSnapshot = await getDocs(collection(db, 'users', uid, 'rooms'));
-        const fetchedRooms = roomsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const fetchedRooms = roomsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          devices: doc.data().devices || [],
+        }));
         setRooms(fetchedRooms);
 
-        const alocados = fetchedRooms.flatMap(room => room.devices.map(device => device.id));
-
-        // Busca todos os dispositivos, excluindo os já alocados
+        const alocados = fetchedRooms.flatMap((room) => room.devices.map((device) => device.id));
         const devicesSnapshot = await getDocs(collection(db, 'users', uid, 'devices'));
         const fetchedDevices = devicesSnapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter(device => !alocados.includes(device.id)); // Exclui dispositivos alocados
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((device) => !alocados.includes(device.id));
 
         setDevices(fetchedDevices);
       } catch (error) {
@@ -43,7 +39,6 @@ const DeviceManager = ({ onClose }) => {
     fetchRoomsAndDevices();
   }, []);
 
-  // Função para adicionar cômodo e atualizar a lista de quartos
   const addRoom = async () => {
     const user = auth.currentUser;
     if (user) {
@@ -54,60 +49,100 @@ const DeviceManager = ({ onClose }) => {
     }
   };
 
-  // Função para excluir um cômodo
   const deleteRoom = async (roomId) => {
     const user = auth.currentUser;
     if (user) {
       const uid = user.uid;
       try {
+        // Encontra os dispositivos do cômodo que será excluído
+        const roomToDelete = rooms.find((room) => room.id === roomId);
+        const devicesToReassign = roomToDelete?.devices || [];
+  
+        // Exclui o cômodo
         await deleteDoc(doc(db, 'users', uid, 'rooms', roomId));
-        setRooms(rooms.filter(room => room.id !== roomId));
+        const updatedRooms = rooms.filter((room) => room.id !== roomId);
+        setRooms(updatedRooms);
+  
+        // Reatribui dispositivos do cômodo excluído à lista principal
+        setDevices((prevDevices) => [...prevDevices, ...devicesToReassign]);
+  
+        // Atualiza os dispositivos no banco de dados
+        await fetchRoomsAndDevices();
+  
+        console.log(`Cômodo ${roomId} excluído com sucesso.`);
       } catch (error) {
         console.error('Erro ao excluir cômodo:', error);
       }
     }
   };
 
-  const handleDrop = async (device, room) => {
-    const updatedRooms = rooms.map(r => {
-      if (r.id === room.id) {
-        const updatedRoom = { ...r, devices: [...r.devices, device] };
-        return updatedRoom;
-      }
-      return r;
-    });
-    setRooms(updatedRooms);
+  const handleDragEnd = async (result) => {
+    const { source, destination } = result;
 
-    const user = auth.currentUser;
-    if (user) {
-      const roomRef = doc(db, 'users', user.uid, 'rooms', room.id);
-      await updateDoc(roomRef, { devices: updatedRooms.find(r => r.id === room.id).devices });
+    // Se não foi arrastado para um destino válido
+    if (!destination) return;
+
+    // Se o local de origem e destino são os mesmos, não faz nada
+    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      return;
     }
 
-    setDevices(devices.filter(d => d.id !== device.id)); // Remove do estado local
-  };
+    const sourceId = source.droppableId;
+    const destinationId = destination.droppableId;
 
-  const handleRemoveDeviceFromRoom = async (device, room) => {
-    const updatedRooms = rooms.map(r => {
-      if (r.id === room.id) {
-        const updatedRoom = { ...r, devices: r.devices.filter(d => d.id !== device.id) };
-        return updatedRoom;
+    let movedDevice;
+    if (sourceId === 'devices') {
+      // Remover dispositivo da lista de dispositivos
+      movedDevice = devices[source.index];
+      setDevices(devices.filter((_, idx) => idx !== source.index));
+    } else {
+      // Remover dispositivo do cômodo de origem
+      const sourceRoom = rooms.find((room) => room.id === sourceId);
+      movedDevice = sourceRoom.devices[source.index];
+      const updatedRooms = rooms.map((room) =>
+        room.id === sourceId ? { ...room, devices: room.devices.filter((_, idx) => idx !== source.index) } : room
+      );
+      setRooms(updatedRooms);
+
+      // Atualizar banco de dados para remover dispositivo do cômodo
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const roomRef = doc(db, 'users', user.uid, 'rooms', sourceId);
+          await updateDoc(roomRef, { devices: updatedRooms.find((room) => room.id === sourceId).devices });
+          console.log(`Dispositivo removido de ${sourceId} no banco de dados.`);
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar o banco de dados:', error);
       }
-      return r;
-    });
-    setRooms(updatedRooms);
-
-    const user = auth.currentUser;
-    if (user) {
-      const roomRef = doc(db, 'users', user.uid, 'rooms', room.id);
-      await updateDoc(roomRef, { devices: updatedRooms.find(r => r.id === room.id).devices });
     }
 
-    setDevices([...devices, device]); // Adiciona de volta ao estado local
+    if (destinationId === 'devices') {
+      // Adicionar dispositivo de volta à lista de dispositivos
+      setDevices([...devices, movedDevice]);
+    } else {
+      // Adicionar dispositivo ao cômodo de destino
+      const updatedRooms = rooms.map((room) =>
+        room.id === destinationId ? { ...room, devices: [...room.devices, movedDevice] } : room
+      );
+      setRooms(updatedRooms);
+
+      // Atualizar banco de dados para adicionar dispositivo ao cômodo
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const roomRef = doc(db, 'users', user.uid, 'rooms', destinationId);
+          await updateDoc(roomRef, { devices: updatedRooms.find((room) => room.id === destinationId).devices });
+          console.log(`Dispositivo adicionado a ${destinationId} no banco de dados.`);
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar o banco de dados:', error);
+      }
+    }
   };
 
   const renameRoom = async (roomId, newName) => {
-    const updatedRooms = rooms.map(r => (r.id === roomId ? { ...r, name: newName } : r));
+    const updatedRooms = rooms.map((r) => (r.id === roomId ? { ...r, name: newName } : r));
     setRooms(updatedRooms);
 
     const user = auth.currentUser;
@@ -117,95 +152,108 @@ const DeviceManager = ({ onClose }) => {
     }
   };
 
-  const Device = ({ device }) => {
-    const [{ isDragging }, drag] = useDrag({
-      type: DeviceType,
-      item: device,
-      collect: (monitor) => ({
-        isDragging: !!monitor.isDragging(),
-      }),
-    });
-
-    return (
-      <div ref={drag} className="device" style={{ opacity: isDragging ? 0.5 : 1 }}>
-        {device.dispositivo}
-      </div>
-    );
-  };
-
-  const Room = ({ room }) => {
-    const [{ canDrop, isOver }, drop] = useDrop({
-      accept: DeviceType,
-      drop: (device) => handleDrop(device, room),
-      collect: (monitor) => ({
-        isOver: !!monitor.isOver(),
-        canDrop: !!monitor.canDrop(),
-      }),
-    });
-  
-    const isActive = canDrop && isOver;
-    const backgroundColor = isActive ? '#f0fff0' : '#f5f5f5';
-  
-    return (
-      <div ref={drop} className="room" style={{ backgroundColor }}>
-        <div className="room-header">
-          <h3 className="room-title">
-            {editingRoom === room.id ? (
-              <input
-                type="text"
-                defaultValue={room.name}
-                onBlur={(e) => {
-                  renameRoom(room.id, e.target.value);
-                  setEditingRoom(null);
-                }}
-                autoFocus
-              />
-            ) : (
-              <span onDoubleClick={() => setEditingRoom(room.id)}>{room.name}</span>
-            )}
-          </h3>
-          <button className="delete-room-button" onClick={() => deleteRoom(room.id)}>
-            Excluir
-          </button>
-        </div>
-        <div className="room-devices">
-          {room.devices.map((device) => (
-            <div
-              key={device.id}
-              className="room-device"
-              onDoubleClick={() => handleRemoveDeviceFromRoom(device, room)}
-            >
-              {device.dispositivo}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DragDropContext onDragEnd={handleDragEnd}>
       <div className="device-manager-overlay">
         <div className="device-manager">
-          <button className="close-device-manager-button" onClick={onClose}>X Fechar</button>
-          <button onClick={addRoom} className="add-room-button">+ Adicionar Cômodo</button>
+          <button className="close-device-manager-button" onClick={onClose}>
+            X Fechar
+          </button>
+          <button onClick={addRoom} className="add-room-button">
+            + Adicionar Cômodo
+          </button>
 
           <h2>Dispositivos</h2>
-          <div className="device-list">
-            {devices.map((device) => (
-              <Device key={device.id} device={device} />
-            ))}
-          </div>
+          <Droppable droppableId="devices">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="device-list"
+              >
+                {devices.map((device, index) => (
+                  <Draggable key={device.id} draggableId={device.id} index={index}>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className="device"
+                      >
+                        {device.dispositivo}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
 
           <h2>Cômodos</h2>
           <div className="room-list">
             {rooms.map((room) => (
-              <Room key={room.id} room={room} />
+              <Droppable key={room.id} droppableId={room.id}>
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="room"
+                  >
+                    <div className="room-header">
+                      {editingRoom === room.id ? (
+                        <input
+                          type="text"
+                          defaultValue={room.name}
+                          onBlur={(e) => {
+                            renameRoom(room.id, e.target.value);
+                            setEditingRoom(null);
+                          }}
+                          autoFocus
+                        />
+                      ) : (
+                        <span onDoubleClick={() => setEditingRoom(room.id)}>{room.name}</span>
+                      )}
+                      <div className="room-actions">
+                        <button
+                          className="edit-room-button"
+                          onClick={() => setEditingRoom(room.id)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="delete-room-button"
+                          onClick={() => deleteRoom(room.id)}
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
+                    <div className="room-devices">
+                      {room.devices.map((device, index) => (
+                        <Draggable key={device.id} draggableId={device.id} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="room-device"
+                            >
+                              {device.dispositivo}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  </div>
+                )}
+              </Droppable>
             ))}
           </div>
         </div>
       </div>
-    </DndProvider>
+    </DragDropContext>
   );
 };
 

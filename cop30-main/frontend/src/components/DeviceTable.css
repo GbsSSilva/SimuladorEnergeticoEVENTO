@@ -1,0 +1,92 @@
+/* Estilos da tabela para telas maiores - Mantendo como estava antes */
+.device-table {
+  margin: 20px auto;
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* Contêiner com rolagem lateral */
+.table-wrapper {
+  overflow-x: auto;  /* Adiciona rolagem horizontal */
+  -webkit-overflow-scrolling: touch;  /* Melhora a rolagem em dispositivos iOS */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  text-align: left;
+}
+
+.table th {
+  background-color: #377f74;
+  color: white;
+}
+
+.table button {
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.table button:hover {
+  background-color: #e04848;
+}
+
+/* Para telas pequenas: cartões em vez de tabela */
+.device-list-mobile {
+  display: none;
+  padding: 20px;
+  max-width: 600px;
+}
+
+@media (max-width: 670px) {
+  .device-table table {
+    display: none;
+  }
+
+  .device-list-mobile {
+    display: block;
+  }
+
+  .device-card {
+    background-color: #f0f4f8;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  .device-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .device-card p {
+    margin: 8px 0;
+    color: #4b4b4b;
+  }
+
+  .device-card button {
+    margin-top: 15px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .device-card button:hover {
+    background-color: #e04848;
+  }
+}

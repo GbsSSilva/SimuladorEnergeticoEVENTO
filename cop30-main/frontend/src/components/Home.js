@@ -51,7 +51,6 @@ const Home = () => {
   return (
     <div id="content">
       <section id="home">
-        <div className="shape"></div>
         <div id="cta">
           <h1 className="title">
             Economize energia, <span>cuide do futuro.</span>

@@ -1,31 +1,41 @@
-.room {
-    padding: 15px;
-    background-color: #f4f4f9;
-    border: 2px dashed #2a9d8f;
-    border-radius: 8px;
-    margin: 10px;
-    min-height: 150px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: background-color 0.2s ease;
-  }
-  
-  .room-hover {
-    background-color: #e0f7f4;
-  }
-  
-  .room-device {
-    background-color: #264653;
-    color: #fff;
-    padding: 8px;
-    border-radius: 5px;
-    margin: 5px 0;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-  
-  .room-device:hover {
-    transform: scale(1.05);
-  }
-  
+.room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-room-button {
+  background-color: #34c759;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.edit-room-input {
+  font-size: 16px;
+  padding: 5px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.delete-room-button {
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.room-hover {
+  background-color: #f0fff0;
+}

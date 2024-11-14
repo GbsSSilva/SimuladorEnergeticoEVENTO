@@ -1,13 +1,12 @@
 // src/pages/Signin/styles.js
 import styled, { keyframes } from "styled-components";
 import bgImage from "../../components/img/bgcop303.webp";
-import Button from "../../components/Button"; // Importando o componente Button
+import Button from "../../components/Button";
 
-// Animação de fade-in
 const fadeIn = keyframes`
   from {
     opacity: 0;
-    transform: translateY(20px); /* Sobe o elemento */
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -15,9 +14,14 @@ const fadeIn = keyframes`
   }
 `;
 
+const maxWidth = "350px"; // Tamanho máximo para todos os elementos
+
 export const PageContainer = styled.div`
   display: flex;
   height: 100vh;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 export const LeftPanel = styled.div`
@@ -28,7 +32,7 @@ export const LeftPanel = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: ${fadeIn} 1s ease-out; /* Animação de fade-in */
+  animation: ${fadeIn} 1s ease-out;
 `;
 
 export const BackgroundText = styled.h1`
@@ -38,7 +42,6 @@ export const BackgroundText = styled.h1`
   padding: 20px 40px;
   border-radius: 10px;
   text-align: center;
-  animation: ${fadeIn} 1.2s ease-out; /* Animação de fade-in */
 `;
 
 export const RightPanel = styled.div`
@@ -49,18 +52,6 @@ export const RightPanel = styled.div`
   align-items: center;
   padding: 20px;
   background-color: #f5f5f5;
-  animation: ${fadeIn} 1.4s ease-out; /* Animação de fade-in */
-`;
-
-export const Container = styled.div`
-  width: 90%;
-  max-width: 400px;
-  padding: 40px;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  animation: ${fadeIn} 1.6s ease-out; /* Animação de fade-in */
 `;
 
 export const Label = styled.h2`
@@ -68,7 +59,6 @@ export const Label = styled.h2`
   color: #2d572c;
   margin-bottom: 20px;
   font-weight: 600;
-  animation: ${fadeIn} 1.8s ease-out; /* Animação de fade-in */
 `;
 
 export const Content = styled.div`
@@ -76,34 +66,23 @@ export const Content = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 15px;
-  animation: ${fadeIn} 2s ease-out; /* Animação de fade-in */
+  width: 100%;
+  max-width: ${maxWidth};
 `;
 
-export const labelError = styled.p`
-  color: #ff6b6b;
-  font-size: 0.9rem;
-  margin: 10px 0;
-  animation: ${fadeIn} 2.2s ease-out; /* Animação de fade-in */
-`;
-
-export const GoogleButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+export const InputField = styled.input`
   width: 100%;
   padding: 12px;
-  font-size: 1rem;
-  color: #444;
-  background-color: #f1f1f1;
-  border: 1px solid #ddd;
+  border: 1px solid #2d572c;
   border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  animation: ${fadeIn} 2.4s ease-out; /* Animação de fade-in */
+  background-color: #ffffff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
 
-  &:hover {
-    background-color: #e0e0e0;
+  &:focus {
+    border-color: #245f2c;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    outline: none;
   }
 `;
 
@@ -118,53 +97,31 @@ export const PasswordToggle = styled.div`
   right: 10px;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #666;
 `;
 
-export const LabelSignup = styled.p`
+export const labelError = styled.p`
+  color: #ff6b6b;
   font-size: 0.9rem;
-  color: #666;
-  animation: ${fadeIn} 2.6s ease-out; /* Animação de fade-in */
+  margin: 10px 0;
+  text-align: center;
 `;
 
-export const Strong = styled.strong`
-  color: #2d572c;
-  font-weight: bold;
-`;
-
-export const InputField = styled.input`
+export const GoogleButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
+  max-width: ${maxWidth};
   padding: 12px;
-  font-size: 1rem;
-  border: 1px solid #2d572c; 
-  border-radius: 5px;
-  background-color: #ffffff;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra leve */
-  color: #333;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
-
-  &:focus {
-    border-color: #245f2c; /* Cor de borda mais escura ao focar */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Aumenta a sombra ao focar */
-    outline: none;
-  }
-`;
-
-// Personalizando o botão de login
-export const LoginButton = styled(Button)`
-  background-color: #2d572c;
-  color: white;
-  font-weight: bold;
-  width: 100%;
-  padding: 12px;
-  border: none;
+  background-color: #f1f1f1;
+  border: 1px solid #ddd;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  animation: ${fadeIn} 2s ease-out; /* Animação de fade-in */
 
   &:hover {
-    background-color: #245f2c;
+    background-color: #e0e0e0;
   }
 `;
 
@@ -172,11 +129,16 @@ export const ForgotPasswordLink = styled.p`
   font-size: 0.9rem;
   color: #2d572c;
   cursor: pointer;
-  margin-top: 15px;
   text-align: center;
-  text-decoration: underline;
+  margin-top: 10px;
+`;
 
-  &:hover {
-    color: #1a4018;
-  }
+export const LabelSignup = styled.p`
+  font-size: 0.9rem;
+  color: #666;
+`;
+
+export const Strong = styled.strong`
+  color: #2d572c;
+  cursor: pointer;
 `;

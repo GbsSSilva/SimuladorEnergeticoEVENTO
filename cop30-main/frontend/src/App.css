@@ -78,7 +78,6 @@ body{
   border-radius: 10px;
   width: 100%;
   max-width: 1000px;
-  margin-top: 20px;
 }
 
 /* Estilo do formulário */
@@ -89,8 +88,7 @@ form {
   background-color: #377f74; 
   padding: 30px;
   border-radius: 10px;
-  color: white; 
-  margin-right: 20px;
+  color: white;
 }
 
 form label {
@@ -132,12 +130,11 @@ form button:hover {
 /* Estilo da tabela de dispositivos */
 .device-table {
   background-color: #A5D6A7;
-  padding: 20px;
   border-radius: 10px;
   width: 100%;
   max-width: 600px;
   color: #2E7D32;
-  max-height: 300px; 
+  max-height: 500px; 
   overflow-y: auto; 
 }
 
@@ -182,7 +179,7 @@ form button:hover {
 /* Parte do Cálculo Total */
 .footer-content {
   background-color: #A5D6A7;
-  padding: 20px;
+  padding: 10px;
   color: #2E7D32;
   border-radius: 10px;
   margin-top: 20px;

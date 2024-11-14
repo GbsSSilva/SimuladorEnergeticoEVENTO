@@ -11,7 +11,6 @@ const GlobalStyle = createGlobalStyle`
    html, body {
     height: 100%;
     overflow-x: hidden;
-    background-color: #f0f2f5;
     font-family: Arial, Helvetica, sans-serif;
   }
 `;

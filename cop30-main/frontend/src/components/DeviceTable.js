@@ -1,18 +1,18 @@
 import React from 'react';
-import { doc, deleteDoc } from 'firebase/firestore';  // Importa a função para deletar do Firestore
-import { db, auth } from '../firebase/firebase';      // Certifique-se de importar a instância do Firestore e a autenticação
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db, auth } from '../firebase/firebase';
+import "./DeviceTable.css"
 
 const DeviceTable = ({ devices, setDevices }) => {
-  const diasNoMes = 30; // Considerando 30 dias no mês
+  const diasNoMes = 30;
 
-  // Função para remover um dispositivo do Firestore
   const removeDeviceFromFirestore = async (deviceId) => {
-    const user = auth.currentUser;  // Pega o usuário autenticado
-    if (user && deviceId) {  // Verifica se o usuário está autenticado e o deviceId está presente
+    const user = auth.currentUser;
+    if (user && deviceId) {
       const uid = user.uid;
       try {
-        const deviceRef = doc(db, 'users', uid, 'devices', deviceId);  // Caminho do documento no Firestore
-        await deleteDoc(deviceRef);  // Deletar o documento do Firestore
+        const deviceRef = doc(db, 'users', uid, 'devices', deviceId);
+        await deleteDoc(deviceRef);
         console.log('Dispositivo removido do Firestore com sucesso');
       } catch (error) {
         console.error('Erro ao remover o dispositivo do Firestore:', error);
@@ -22,15 +22,14 @@ const DeviceTable = ({ devices, setDevices }) => {
     }
   };
 
-  // Função para remover o dispositivo da tabela e do Firestore
   const handleRemoveDevice = async (index, deviceId) => {
     if (deviceId) {
       const user = auth.currentUser;
       if (user) {
         try {
-          await removeDeviceFromFirestore(deviceId);  // Primeiro, remova do Firestore
-          const newDevices = devices.filter((_, i) => i !== index);  // Remova da lista local
-          setDevices(newDevices);  // Atualiza o estado com a lista sem o dispositivo removido
+          await removeDeviceFromFirestore(deviceId);
+          const newDevices = devices.filter((_, i) => i !== index);
+          setDevices(newDevices);
         } catch (error) {
           console.error('Erro ao remover o dispositivo:', error);
         }
@@ -40,58 +39,81 @@ const DeviceTable = ({ devices, setDevices }) => {
 
   return (
     <div className="device-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Dispositivo</th>
-            <th>Potência (W/h)</th>
-            <th>Tempo de uso</th>
-            <th>Quantidade</th>
-            <th>Custo médio no mês (R$)</th>
-            <th>Remover</th>
-          </tr>
-        </thead>
-        <tbody>
-          {devices.length > 0 ? (
-            devices.map((device, index) => {
-              let horasUso;
-
-              // Se a unidade for minutos, converte para horas
-              if (device.unidade_tempo === 'minutos') {
-                horasUso = device.tempo_uso / 60; // Converte minutos para horas
-              } else {
-                horasUso = device.tempo_uso; // Tempo já em horas
-              }
-
-              // Calcula o consumo em kWh diário
-              const consumoKwhDiario = (device.potencia * horasUso * device.quantidade) / 1000;
-              // Calcula o consumo mensal multiplicando pelos dias do mês
-              const consumoMensalKwh = consumoKwhDiario * diasNoMes;
-              // Calcula o custo com base na tarifa de R$ 0,93845 por kWh
-              const custo = consumoMensalKwh * 0.93845;
-
-              return (
-                <tr key={index}>
-                  <td>{device.dispositivo}</td>
-                  <td>{device.potencia}</td>
-                  <td>
-                    {device.tempo_uso} {device.unidade_tempo === 'minutos' ? 'min/dia' : 'horas/dia'}
-                  </td>
-                  <td>{device.quantidade}</td>
-                  <td>{custo.toFixed(2)}</td>
-                  <td>
-                    <button onClick={() => handleRemoveDevice(index, device.id)}>X</button> {/* Passe o ID correto */}
-                  </td>
-                </tr>
-              );
-            })
-          ) : (
+      {/* Contêiner com rolagem lateral */}
+      <div className="table-wrapper">
+        <table className="table">
+          <thead>
             <tr>
-              <td colSpan="6">Nenhum dispositivo adicionado ainda</td>
+              <th>Dispositivo</th>
+              <th>Potência (W/h)</th>
+              <th>Tempo de uso</th>
+              <th>Quantidade</th>
+              <th>Custo médio no mês (R$)</th>
+              <th>Remover</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {devices.length > 0 ? (
+              devices.map((device, index) => {
+                let horasUso;
+                if (device.unidade_tempo === 'minutos') {
+                  horasUso = device.tempo_uso / 60;
+                } else {
+                  horasUso = device.tempo_uso;
+                }
+
+                const consumoKwhDiario = (device.potencia * horasUso * device.quantidade) / 1000;
+                const consumoMensalKwh = consumoKwhDiario * diasNoMes;
+                const custo = consumoMensalKwh * 0.93845;
+
+                return (
+                  <tr key={index}>
+                    <td>{device.dispositivo}</td>
+                    <td>{device.potencia}</td>
+                    <td>{device.tempo_uso} {device.unidade_tempo === 'minutos' ? 'min/dia' : 'horas/dia'}</td>
+                    <td>{device.quantidade}</td>
+                    <td>{custo.toFixed(2)}</td>
+                    <td>
+                      <button onClick={() => handleRemoveDevice(index, device.id)}>X</button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="6">Nenhum dispositivo adicionado ainda</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Para telas pequenas, exibe a versão de lista ou cartões */}
+      <div className="device-list-mobile">
+        {devices.map((device, index) => {
+          let horasUso;
+          if (device.unidade_tempo === 'minutos') {
+            horasUso = device.tempo_uso / 60;
+          } else {
+            horasUso = device.tempo_uso;
+          }
+
+          const consumoKwhDiario = (device.potencia * horasUso * device.quantidade) / 1000;
+          const consumoMensalKwh = consumoKwhDiario * diasNoMes;
+          const custo = consumoMensalKwh * 0.93845;
+
+          return (
+            <div className="device-card" key={index}>
+              <p><strong>Dispositivo:</strong> {device.dispositivo}</p>
+              <p><strong>Potência (W/h):</strong> {device.potencia}</p>
+              <p><strong>Tempo de Uso:</strong> {device.tempo_uso} {device.unidade_tempo === 'minutos' ? 'min/dia' : 'horas/dia'}</p>
+              <p><strong>Quantidade:</strong> {device.quantidade}</p>
+              <p><strong>Custo médio no mês (R$):</strong> {custo.toFixed(2)}</p>
+              <button onClick={() => handleRemoveDevice(index, device.id)}>Remover</button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

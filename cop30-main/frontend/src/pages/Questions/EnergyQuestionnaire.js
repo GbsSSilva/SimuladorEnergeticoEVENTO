@@ -4,20 +4,19 @@ import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore'
 import { useNavigate } from 'react-router-dom'; 
 import { motion } from 'framer-motion'; 
 import {
-    BodyContainer,
-    MainBackground,
-    QuestionnaireContainer,
-    QuestionTitle,
-    QuestionContainer,
-    QuestionText,
-    RadioContainer,
-    RadioLabel,
-    ButtonContainer,
-    Button,
-    HomeButton,
-    ErrorMessage,
-    ResponsiveContainer,
-  } from './styles'; //
+  BodyContainer,
+  MainBackground,
+  QuestionnaireContainer,
+  QuestionTitle,
+  QuestionText,
+  RadioContainer,
+  RadioLabel,
+  ButtonContainer,
+  Button,
+  HomeButton,
+  ErrorMessage,
+  ProgressCounter, // Importado o estilo do contador
+} from './styles'; 
 
 const questions = [
   {
@@ -86,9 +85,8 @@ const EnergyQuestionnaire = () => {
   const [respostas, setRespostas] = useState({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate(); // Substitui useHistory
+  const navigate = useNavigate();
 
-  // Verificar se o usuário já respondeu o questionário
   useEffect(() => {
     const fetchQuestionnaire = async () => {
       const user = auth.currentUser;
@@ -96,7 +94,6 @@ const EnergyQuestionnaire = () => {
         const uid = user.uid;
         const querySnapshot = await getDocs(collection(db, 'users', uid, 'questionnaire'));
         if (!querySnapshot.empty) {
-          // Redirecionar para a página de análise se o questionário já foi respondido
           navigate('/analise');
         }
       }
@@ -129,7 +126,7 @@ const EnergyQuestionnaire = () => {
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setErrorMessage(''); // Limpa qualquer mensagem de erro quando voltar
+      setErrorMessage('');
     }
   };
 
@@ -138,16 +135,14 @@ const EnergyQuestionnaire = () => {
     if (user) {
       const uid = user.uid;
 
-      // Apagar respostas anteriores
       const querySnapshot = await getDocs(collection(db, 'users', uid, 'questionnaire'));
       querySnapshot.forEach(async (docSnapshot) => {
         await deleteDoc(doc(db, 'users', uid, 'questionnaire', docSnapshot.id));
       });
 
       try {
-        // Salvar as novas respostas no Firestore
         await addDoc(collection(db, 'users', uid, 'questionnaire'), respostas);
-        navigate('/analise'); 
+        navigate('/analise');
       } catch (error) {
         console.error('Erro ao salvar o questionário:', error);
       }
@@ -157,10 +152,16 @@ const EnergyQuestionnaire = () => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-<BodyContainer>
+    <BodyContainer>
       <MainBackground>
         <QuestionnaireContainer>
           <QuestionTitle>Questionário de Consumo Energético</QuestionTitle>
+          
+          {/* Adicionado o contador */}
+          <ProgressCounter>
+            Questão {currentQuestionIndex + 1} de {questions.length}
+          </ProgressCounter>
+
           <motion.div
             key={currentQuestionIndex}
             initial={{ opacity: 0, x: 100 }}
