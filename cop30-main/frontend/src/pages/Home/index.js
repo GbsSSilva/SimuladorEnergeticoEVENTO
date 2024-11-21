@@ -6,7 +6,7 @@ import Economize from '../../components/Economize';
 import COP30 from '../../components/COP30';
 import Footer from '../../components/Footer';
 import ChatbotIcon from '../../components/ChatbotIcon';
-import ChatWindow from '../../components/ChatWindow';
+import Chatbot from '../../components/Chatbot';
 import Sidebar from '../../components/Sidebar';
 import { db, auth } from '../../firebase/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
@@ -102,9 +102,9 @@ function App() {
       {/* Chatbot */}
       <div className="chatbot-container">
         <button className="chatbot-button" onClick={toggleChat}>
-          <ChatbotIcon size={40} color="#2E7D32" />
+          <ChatbotIcon size={40} color="#FFA726" />
         </button>
-        <ChatWindow isOpen={isChatOpen} toggleChat={toggleChat} />
+        <Chatbot isOpen={isChatOpen} toggleChat={toggleChat} />
       </div>
     </div>
   );

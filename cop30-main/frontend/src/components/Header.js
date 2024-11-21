@@ -37,7 +37,7 @@ const Header = () => {
             <a href="#servicos">Como Economizar</a>
           </li>
           <li className="nav-item">
-            <a href="#sobre">Sobre a COP-30</a>
+            <a href="#testimonials">Sobre a COP-30</a>
           </li>
         </ul>
 

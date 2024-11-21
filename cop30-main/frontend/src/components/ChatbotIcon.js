@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ChatbotIcon = ({ size = 24, color = '#2E7D32' }) => {
+const ChatbotIcon = ({ size = 24, color = '#00BCD4' }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -177,6 +177,10 @@ const AnalisePage = () => {
           <p className="no-rooms-message">
             Você ainda não possui nenhum cômodo incluído. Adicione um para visualizar o gráfico.
           </p>
+        ) : consumoPorQuarto.every((room) => room.consumo === 0) ? (
+          <p className="no-devices-in-rooms-message">
+            Nenhum dispositivo foi alocado a nenhum cômodo. Aloque dispositivos para visualizar o gráfico.
+          </p>
         ) : (
           <Chart
             chartType="PieChart"
